@@ -52,7 +52,7 @@ if st.button("🚀 צור קמפיין שיווקי", type="primary"):
 
         # שימוש במודל המעודכן
         response = client.models.generate_content(
-            model="gemini-3.8-flash", contents=prompt
+            model="gemini-2.5-flash", contents=prompt
         )
 
         st.success("הקמפיין הופק בהצלחה!")
