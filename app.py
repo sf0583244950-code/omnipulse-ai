@@ -1,4 +1,4 @@
-from google import genai
+import google.generativeai as genai
 import streamlit as st
 
 # הגדרת עמוד ואופטימיזציה למובייל
@@ -11,9 +11,8 @@ api_key = st.secrets.get("GEMINI_API_KEY")
 
 if not api_key:
   st.error("חסר מפתח GEMINI_API_KEY בהגדרות ה-Secrets בסטרימלייט!")
-  client = None
 else:
-  client = genai.Client(api_key=api_key)
+  genai.configure(api_key=api_key)
 
 st.title("⚡ Social Media Drip Campaigner")
 st.write("מחולל תוכן שיווקי אוטומטי לרשתות חברתיות מחומר גלם אחד.")
@@ -31,11 +30,11 @@ raw_input = st.text_area(
 if st.button("🚀 צור קמפיין שיווקי", type="primary"):
   if not raw_input.strip():
     st.warning("נא להזין טקסט או רעיון לפני יצירת הקמפיין.")
-  elif not client:
-    st.error("לא ניתן להתחבר ל-AI עקב היעדר מפתח API.")
   else:
     with st.spinner("מייצר קמפיין שיווקי מותאם אישית לכל הרשתות..."):
       try:
+        # שימוש במודל היציב של הספרייה הקלאסית
+        model = genai.GenerativeModel("gemini-1.5-flash")
         prompt = f"""
                 אתה מומחה שיווק דיגיטלי ואסטרטג תוכן.
                 בהינתן חומר הגלם הבא, צור עבורי קמפיין שיווקי מלא המחולק ל-3 פלטפורמות שונות:
@@ -50,23 +49,7 @@ if st.button("🚀 צור קמפיין שיווקי", type="primary"):
                 הצג את התוצאות בצורה נקייה, מעוצבת ומוכנה להעתקה לכל רשת חברתית.
                 """
 
-        # מנגנון ניסיון אוטומטי למודלים שונים כדי למנוע נפילות עומס (503 או 404)
-        response = None
-        models_to_try = ["gemini-1.5-pro", "gemini-1.5-flash"]
-        last_error = None
-
-        for model_name in models_to_try:
-          try:
-            response = client.models.generate_content(
-                model=model_name, contents=prompt
-            )
-            break
-          except Exception as err:
-            last_error = err
-            continue
-
-        if response is None:
-          raise last_error
+        response = model.generate_content(prompt)
 
         st.success("הקמפיין הופק בהצלחה!")
         st.markdown("---")
