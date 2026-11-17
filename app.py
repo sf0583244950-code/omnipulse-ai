@@ -50,9 +50,9 @@ if st.button("🚀 צור קמפיין שיווקי", type="primary"):
                 הצג את התוצאות בצורה נקייה, מעוצבת ומוכנה להעתקה לכל רשת חברתית.
                 """
 
-        # שימוש במודל שמותאם במדויק ל-SDK הנוכחי שמותקן אצלך
+        # שימוש בשם המודל המדויק שהשרת דרש בהודעת השגיאה
         response = client.models.generate_content(
-            model="gemini-2.5-flash", contents=prompt
+            model="models/gemini-3.8-flash", contents=prompt
         )
 
         st.success("הקמפיין הופק בהצלחה!")
