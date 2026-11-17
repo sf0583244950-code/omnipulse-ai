@@ -1,14 +1,5 @@
+from google import genai
 import streamlit as st
-
-# ניסיון טעינה אוטומטי של הספרייה המותאמת בהתאם למה שמותקן בשרת
-try:
-  from google import genai
-
-  USING_NEW_SDK = True
-except ImportError:
-  import google.generativeai as genai
-
-  USING_NEW_SDK = False
 
 # הגדרת עמוד ואופטימיזציה למובייל
 st.set_page_config(
@@ -18,14 +9,11 @@ st.set_page_config(
 # טעינת מפתח ה-API מתוך ה-Secrets של סטרימלייט
 api_key = st.secrets.get("GEMINI_API_KEY")
 
-client = None
 if not api_key:
   st.error("חסר מפתח GEMINI_API_KEY בהגדרות ה-Secrets בסטרימלייט!")
+  client = None
 else:
-  if USING_NEW_SDK:
-    client = genai.Client(api_key=api_key)
-  else:
-    genai.configure(api_key=api_key)
+  client = genai.Client(api_key=api_key)
 
 st.title("⚡ Social Media Drip Campaigner")
 st.write("מחולל תוכן שיווקי אוטומטי לרשתות חברתיות מחומר גלם אחד.")
@@ -43,7 +31,7 @@ raw_input = st.text_area(
 if st.button("🚀 צור קמפיין שיווקי", type="primary"):
   if not raw_input.strip():
     st.warning("נא להזין טקסט או רעיון לפני יצירת הקמפיין.")
-  elif not api_key:
+  elif not client:
     st.error("לא ניתן להתחבר ל-AI עקב היעדר מפתח API.")
   else:
     with st.spinner("מייצר קמפיין שיווקי מותאם אישית לכל הרשתות..."):
@@ -62,21 +50,14 @@ if st.button("🚀 צור קמפיין שיווקי", type="primary"):
                 הצג את התוצאות בצורה נקייה, מעוצבת ומוכנה להעתקה לכל רשת חברתית.
                 """
 
-        if USING_NEW_SDK:
-          # שימוש במודל שמותאם לספרייה החדשה
-          response = client.models.generate_content(
-              model="gemini-2.5-flash", contents=prompt
-          )
-          result_text = response.text
-        else:
-          # שימוש במודל שמותאם לספרייה הישנה
-          model = genai.GenerativeModel("gemini-1.5-flash")
-          response = model.generate_content(prompt)
-          result_text = response.text
+        # שימוש ישיר בשם המודל המדויק שהשרת דרש
+        response = client.models.generate_content(
+            model="models/gemini-3.8-flash", contents=prompt
+        )
 
         st.success("הקמפיין הופק בהצלחה!")
         st.markdown("---")
-        st.markdown(result_text)
+        st.markdown(response.text)
 
       except Exception as e:
         st.error(f"אירעה שגיאה: {e}")
