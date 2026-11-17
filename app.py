@@ -50,10 +50,23 @@ if st.button("🚀 צור קמפיין שיווקי", type="primary"):
                 הצג את התוצאות בצורה נקייה, מעוצבת ומוכנה להעתקה לכל רשת חברתית.
                 """
 
-        # שימוש במודל הנכון והנתמך ביותר כרגע עבור ספרייה זו
-        response = client.models.generate_content(
-            model="gemini-2.5-flash", contents=prompt
-        )
+        # מנגנון ניסיון אוטומטי למודלים שונים כדי למנוע נפילות עומס (503 או 404)
+        response = None
+        models_to_try = ["gemini-1.5-pro", "gemini-1.5-flash"]
+        last_error = None
+
+        for model_name in models_to_try:
+          try:
+            response = client.models.generate_content(
+                model=model_name, contents=prompt
+            )
+            break
+          except Exception as err:
+            last_error = err
+            continue
+
+        if response is None:
+          raise last_error
 
         st.success("הקמפיין הופק בהצלחה!")
         st.markdown("---")
