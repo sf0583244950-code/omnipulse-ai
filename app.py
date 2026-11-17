@@ -6,7 +6,7 @@ st.set_page_config(
     page_title="Social Media Drip Campaigner", page_icon="⚡", layout="centered"
 )
 
-# טעינת מפתח ה-API מתוך ה-Secrets של סטרימלייט
+# טעינת מפתח ה-API מתוך ה-Secrets של סטרימלייט בצורה בטוחה
 api_key = st.secrets.get("GEMINI_API_KEY")
 
 if not api_key:
@@ -50,9 +50,9 @@ if st.button("🚀 צור קמפיין שיווקי", type="primary"):
                 הצג את התוצאות בצורה נקייה, מעוצבת ומוכנה להעתקה לכל רשת חברתית.
                 """
 
-        # שימוש בשם המודל המלא כפי שנדרש
+        # קריאה מדויקת למודל היציב והמהיר
         response = client.models.generate_content(
-            model="models/gemini-3.8-flash", contents=prompt
+            model="gemini-1.5-flash", contents=prompt
         )
 
         st.success("הקמפיין הופק בהצלחה!")
